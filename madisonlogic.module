@@ -76,11 +76,17 @@ function madisonlogic_page_alter(&$page) {
   $pub = variable_get('madisonlogic_pub');
   $email_fields = preg_replace('/\s|\'/', '', variable_get('madisonlogic_email_felds'));
 
+  // Allow other modules to provide the email.
+  $madisonlogic_email = module_invoke_all('madisonlogic_email');
+  
   if($enabled && $pub && $email_fields) {
     $email_fields = explode(',',$email_fields);
     $script = "(function () {";
     $script .= "_ml = window._ml || {};";
     $script .= "_ml.pub = '" . $pub . "';";
+    if (!empty($madisonlogic_email)) {
+      $script .= "_ml.em = '" . sha1($madisonlogic_email) . "';";
+    }    
     $script .= "_ml.ht = 'shex';";
     $script .= "_ml.ef = ['".implode("','",$email_fields)."'];";
     $script .= "var s = document.getElementsByTagName('script')[0], cd = new Date(), mltag = document.createElement('script');";
