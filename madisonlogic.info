@@ -1,3 +1,5 @@
-name = Madison Logic
-description = Adds Madison Logic javascript code to your site's pages.
+name = Madisonlogic
+description = Adds Madisonlogic javascript code to your site's pages.
 core = 7.x
+configure = admin/config/system/madisonlogic
+package = Advertising

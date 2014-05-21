@@ -64,7 +64,7 @@ function madisonlogic_admin_settings($form, &$form_state) {
     '#default_value' => variable_get('madisonlogic_enabled')
   );
 
- return system_settings_form($form);
+  return system_settings_form($form);
 }
 
 /**
@@ -78,17 +78,17 @@ function madisonlogic_page_alter(&$page) {
 
   // Allow other modules to provide the email.
   $madisonlogic_email = module_invoke_all('madisonlogic_email');
-  
-  if($enabled && $pub && $email_fields) {
-    $email_fields = explode(',',$email_fields);
+
+  if ($enabled && $pub && $email_fields) {
+    $email_fields = explode(',', $email_fields);
     $script = "(function () {";
     $script .= "_ml = window._ml || {};";
     $script .= "_ml.pub = '" . $pub . "';";
     if (!empty($madisonlogic_email)) {
       $script .= "_ml.em = '" . sha1($madisonlogic_email) . "';";
-    }    
+    }
     $script .= "_ml.ht = 'shex';";
-    $script .= "_ml.ef = ['".implode("','",$email_fields)."'];";
+    $script .= "_ml.ef = ['" . implode("','", $email_fields) . "'];";
     $script .= "var s = document.getElementsByTagName('script')[0], cd = new Date(), mltag = document.createElement('script');";
     $script .= "mltag.type = 'text/javascript'; mltag.async = true;";
     $script .= "mltag.src = '//ml314.com/tag.aspx?' + cd.getDate() + cd.getMonth() + cd.getFullYear();";
