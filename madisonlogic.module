@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * Implements hook_help().
+ */
+function madisonlogic_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#madisonlogic':
+      return t('<a href="@madison_url">Madison Logic</a> Content Consumption Monitoring (CCM) is a technology that monitors B2B content consumption activities', array('@madison_url' => 'http://www.madisonlogic.com/data-products/#tab-1397247504107-3-2'));
+  }
+}
+
+/**
+ * Implements hook_permission().
+ */
+function madisonlogic_permission() {
+  return array(
+    'administer MadisonLogic configuration' => array(
+      'title' => t('Administer MadisonLogic configuration'),
+    )
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function madisonlogic_menu() {
+  $items['admin/config/system/madisonlogic'] = array(
+    'title' => 'MadisonLogic',
+    'description' => "Configure the settings used to integrate MadisonLogic.",
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('madisonlogic_admin_settings'),
+    'access arguments' => array('administer MadisonLogic configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Admin settings form for module settings configuration.
+ */
+function madisonlogic_admin_settings($form, &$form_state) {
+  $form = array();
+
+  $form['madisonlogic_pub'] = array(
+    '#type' => 'textfield',
+    '#title' => t('PUB'),
+    '#default_value' => variable_get('madisonlogic_pub'),
+    '#required' => TRUE
+  );
+
+  $form['madisonlogic_email_felds'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email fields'),
+    '#description' => t("Can be used for mapping email form fields. Specify email fields by ID(#), classname(.) or Field name(*). Separate by comma if there is more than one: #idemail,.classemail,*nameemail"),
+    '#default_value' => variable_get('madisonlogic_email_felds'),
+    '#required' => TRUE
+  );
+
+  $form['madisonlogic_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enabled'),
+    '#default_value' => variable_get('madisonlogic_enabled')
+  );
+
+ return system_settings_form($form);
+}
+
+/**
+ * Implements hook_page_alter().
+ * To insert MadisonLogic Javascript to the footer of the page
+ */
+function madisonlogic_page_alter(&$page) {
+  $enabled = variable_get('madisonlogic_enabled');
+  $pub = variable_get('madisonlogic_pub');
+  $email_fields = variable_get('madisonlogic_email_felds');
+
+  if($enabled && $pub && $email_fields) {
+    $email_fields = explode(',',$email_fields);
+    $script = "(function () {";
+    $script .= "_ml = window._ml || {};";
+    $script .= "_ml.pub = '" . $pub . "';";
+    $script .= "_ml.ht = 'shex';";
+    $script .= "_ml.ef = ['".implode("','",$email_fields)."'];";
+    $script .= "var s = document.getElementsByTagName('script')[0], cd = new Date(), mltag = document.createElement('script');";
+    $script .= "mltag.type = 'text/javascript'; mltag.async = true;";
+    $script .= "mltag.src = '//ml314.com/tag.aspx?' + cd.getDate() + cd.getMonth() + cd.getFullYear();";
+    $script .= "s.parentNode.insertBefore(mltag, s);";
+    $script .= "})();";
+
+    drupal_add_js($script, array('scope' => 'footer', 'type' => 'inline'));
+  }
+}

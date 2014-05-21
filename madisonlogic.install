@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function madisonlogic_install() {
+
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function madisonlogic_uninstall() {
+  variable_del('madisonlogic_pub');
+  variable_del('madisonlogic_email_fields');
+  variable_del('madisonlogic_enabled');
+}
